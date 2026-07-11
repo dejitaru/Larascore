@@ -1,0 +1,104 @@
+name: Analyze Laravel Repo
+
+on:
+  workflow_dispatch:
+    inputs:
+      analysis_id:
+        required: true
+      repo_owner:
+        required: true
+      repo_name:
+        required: true
+      callback_token:
+        required: true
+      callback_url:
+        required: true
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout analyzer repo
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      # Inputs pasados por env, nunca interpolados con ${{ }} dentro de run: (evita inyección de comandos)
+      - name: Clone target repo
+        env:
+          REPO_OWNER: ${{ inputs.repo_owner }}
+          REPO_NAME: ${{ inputs.repo_name }}
+        run: |
+          git clone "https://github.com/${REPO_OWNER}/${REPO_NAME}.git" /tmp/repo
+
+      - name: Install dependencies
+        run: |
+          cd /tmp/repo
+          composer install --no-interaction --prefer-dist || true
+
+      - name: Install PHP Insights
+        run: |
+          cd /tmp/repo
+          composer require --dev nunomaduro/phpinsights || true
+
+      # phpstan/insights devuelven exit != 0 cuando encuentran errores (caso normal) -> || true evita
+      # que el step aborte el job antes de reportar resultados
+      - name: Run PHP Insights
+        run: |
+          cd /tmp/repo
+          php artisan insights --format=json > /tmp/insights.json || true
+
+      - name: Install PHPStan
+        run: |
+          cd /tmp/repo
+          composer require --dev phpstan/phpstan || true
+
+      - name: Run PHPStan
+        run: |
+          cd /tmp/repo
+          vendor/bin/phpstan analyse --error-format=json > /tmp/phpstan.json || true
+
+      - name: Build result JSON
+        env:
+          ANALYSIS_ID: ${{ inputs.analysis_id }}
+          CALLBACK_TOKEN: ${{ inputs.callback_token }}
+          REPO_OWNER: ${{ inputs.repo_owner }}
+          REPO_NAME: ${{ inputs.repo_name }}
+        run: |
+          cat <<EOF > /tmp/result.json
+          {
+            "analysis_id": "${ANALYSIS_ID}",
+            "callback_token": "${CALLBACK_TOKEN}",
+            "repo_owner": "${REPO_OWNER}",
+            "repo_name": "${REPO_NAME}",
+            "status": "completed",
+            "phpstan": $(cat /tmp/phpstan.json 2>/dev/null || echo 'null'),
+            "insights": $(cat /tmp/insights.json 2>/dev/null || echo 'null')
+          }
+          EOF
+
+      - name: Send result to app
+        env:
+          CALLBACK_URL: ${{ inputs.callback_url }}
+        run: |
+          curl -sf -X POST "${CALLBACK_URL}" \
+            -H "Content-Type: application/json" \
+            -d @/tmp/result.json
+
+      # Red de seguridad: si algo inesperado rompió el job, reporta el fallo igual para no dejar
+      # el analysis atascado en "analyzing" (ver también el comando analyses:mark-stale-as-failed)
+      - name: Report failure
+        if: failure()
+        env:
+          ANALYSIS_ID: ${{ inputs.analysis_id }}
+          CALLBACK_TOKEN: ${{ inputs.callback_token }}
+          CALLBACK_URL: ${{ inputs.callback_url }}
+        run: |
+          curl -sf -X POST "${CALLBACK_URL}" \
+            -H "Content-Type: application/json" \
+            -d "{\"analysis_id\":\"${ANALYSIS_ID}\",\"callback_token\":\"${CALLBACK_TOKEN}\",\"status\":\"failed\"}"
