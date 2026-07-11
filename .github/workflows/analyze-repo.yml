@@ -63,6 +63,10 @@ jobs:
           cd /tmp/repo
           vendor/bin/phpstan analyse --error-format=json > /tmp/phpstan.json || true
 
+      - name: Run Taylor-style rules
+        run: |
+          php "${GITHUB_WORKSPACE}/scripts/taylor-rules.php" /tmp/repo > /tmp/taylor.json || true
+
       - name: Build result JSON
         env:
           ANALYSIS_ID: ${{ inputs.analysis_id }}
@@ -78,7 +82,8 @@ jobs:
             "repo_name": "${REPO_NAME}",
             "status": "completed",
             "phpstan": $(cat /tmp/phpstan.json 2>/dev/null || echo 'null'),
-            "insights": $(cat /tmp/insights.json 2>/dev/null || echo 'null')
+            "insights": $(cat /tmp/insights.json 2>/dev/null || echo 'null'),
+            "taylor_rules": $(cat /tmp/taylor.json 2>/dev/null || echo 'null')
           }
           EOF
 

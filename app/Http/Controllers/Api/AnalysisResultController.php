@@ -20,6 +20,7 @@ class AnalysisResultController extends Controller
             'repo_name' => ['required_if:status,completed', 'string'],
             'phpstan' => ['nullable', 'array'],
             'insights' => ['nullable', 'array'],
+            'taylor_rules' => ['nullable', 'array'],
         ]);
 
         $analysis = Analysis::find($data['analysis_id']);
@@ -42,7 +43,7 @@ class AnalysisResultController extends Controller
             return response()->json(['message' => 'Repo mismatch'], 403);
         }
 
-        $result = $calculator->calculate($data['phpstan'] ?? null, $data['insights'] ?? null);
+        $result = $calculator->calculate($data['phpstan'] ?? null, $data['insights'] ?? null, $data['taylor_rules'] ?? null);
 
         $analysis->update([
             'status' => Analysis::STATUS_COMPLETED,
