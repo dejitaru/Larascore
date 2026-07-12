@@ -18,10 +18,6 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    env:
-      # El repo objetivo es desconocido/no confiable, pero corre en un runner efímero y aislado
-      # (ver proyect.md sección de seguridad); permitir sus plugins de Composer no amplía ese riesgo.
-      COMPOSER_ALLOW_PLUGINS: "true"
 
     steps:
       - name: Checkout analyzer repo
@@ -31,6 +27,11 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
+
+      # El repo objetivo es desconocido/no confiable, pero corre en un runner efímero y aislado
+      # (ver proyect.md sección de seguridad); permitir sus plugins de Composer no amplía ese riesgo.
+      - name: Allow Composer plugins globally
+        run: composer global config allow-plugins true
 
       # Inputs pasados por env, nunca interpolados con ${{ }} dentro de run: (evita inyección de comandos)
       - name: Clone target repo
