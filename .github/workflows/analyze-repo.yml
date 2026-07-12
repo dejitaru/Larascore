@@ -18,6 +18,10 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      # El repo objetivo es desconocido/no confiable, pero corre en un runner efímero y aislado
+      # (ver proyect.md sección de seguridad); permitir sus plugins de Composer no amplía ese riesgo.
+      COMPOSER_ALLOW_PLUGINS: "true"
 
     steps:
       - name: Checkout analyzer repo
