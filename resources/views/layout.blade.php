@@ -235,13 +235,59 @@
             margin-top: 2rem;
             font-size: 0.8rem;
             color: var(--muted);
+            text-align: center;
+        }
+        .footer-credits {
+            margin: var(--space-1) 0 0;
+        }
+        .footer-word {
+            display: inline-block;
+            font-weight: 600;
+            color: var(--fg);
+            transition: opacity 0.25s ease;
+        }
+        .footer-word.is-swapping {
+            opacity: 0;
         }
     </style>
 </head>
 <body>
     <main>
         @yield('content')
-        <footer>Inspired on maintainability and simplicity.</footer>
+        <footer>
+            Inspired on maintainability and simplicity.
+            <p class="footer-credits">Built with <span class="footer-word" id="footer-word-a">love</span> and <span class="footer-word" id="footer-word-b">coffee</span>.</p>
+        </footer>
     </main>
+    <script>
+        (function () {
+            const words = ['love', 'codex', 'coffee', 'beer', 'patience', 'claude', 'red bull', 'whisky', 'faith'];
+            const wordA = document.getElementById('footer-word-a');
+            const wordB = document.getElementById('footer-word-b');
+
+            function pickTwoDistinct() {
+                const a = words[Math.floor(Math.random() * words.length)];
+                let b = a;
+                while (b === a) {
+                    b = words[Math.floor(Math.random() * words.length)];
+                }
+                return [a, b];
+            }
+
+            function swap() {
+                const [a, b] = pickTwoDistinct();
+
+                [wordA, wordB].forEach((el) => el.classList.add('is-swapping'));
+
+                setTimeout(() => {
+                    wordA.textContent = a;
+                    wordB.textContent = b;
+                    [wordA, wordB].forEach((el) => el.classList.remove('is-swapping'));
+                }, 250);
+            }
+
+            setInterval(swap, 2800);
+        })();
+    </script>
 </body>
 </html>
