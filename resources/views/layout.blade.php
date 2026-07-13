@@ -104,6 +104,9 @@
             font-size: 0.8rem;
             color: var(--muted);
         }
+        .rating-legend-item {
+            white-space: nowrap;
+        }
         .metrics {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
