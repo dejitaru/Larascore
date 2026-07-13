@@ -76,6 +76,11 @@
             cursor: pointer;
         }
         button:hover { opacity: 0.85; }
+        .form-hint {
+            margin: var(--space-2) 0 0;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
         .errors {
             margin-top: 1rem;
             color: var(--accent);
@@ -84,10 +89,9 @@
         .score-explainer {
             margin-top: var(--space-8);
             padding: var(--space-6);
-            border-left: 3px solid var(--accent);
-            background: rgba(245, 48, 3, 0.04);
-            background: color-mix(in srgb, var(--accent) 6%, transparent);
-            border-radius: 0 0.5rem 0.5rem 0;
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            background: color-mix(in srgb, var(--fg) 3%, transparent);
         }
         .score-explainer h2 {
             margin: 0 0 var(--space-4);
@@ -97,45 +101,44 @@
             text-transform: uppercase;
             color: var(--muted);
         }
-        .factor-grid {
+        .factor-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: var(--space-4);
+            gap: var(--space-4) var(--space-6);
         }
-        .factor-card {
+        .factor-heading {
             display: flex;
-            flex-direction: column;
-            gap: var(--space-1);
-        }
-        .factor-weight {
-            font-size: 1.5rem;
-            font-weight: 700;
-            line-height: 1;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: var(--space-2);
         }
         .factor-name {
             font-size: 0.9rem;
             font-weight: 600;
         }
+        .factor-weight {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--muted);
+        }
         .factor-desc {
+            margin: var(--space-1) 0 0;
             font-size: 0.8rem;
             color: var(--muted);
             line-height: 1.5;
         }
-        .explainer-notes {
+        .explainer-note {
             margin: var(--space-6) 0 0;
             padding-top: var(--space-4);
             border-top: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-2);
-        }
-        .explainer-notes p {
-            margin: 0;
             font-size: 0.8rem;
             color: var(--muted);
             line-height: 1.6;
         }
-        .explainer-notes strong {
+        .explainer-note strong {
             color: var(--fg);
             font-weight: 600;
         }

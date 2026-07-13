@@ -17,6 +17,7 @@
         >
         <button type="submit">Analyze</button>
     </form>
+    <p class="form-hint">Only public GitHub repositories can be analyzed. To test a private repo, clone Larascore and run it locally with your own GitHub Actions token.</p>
 
     @if ($errors->any())
         <div class="errors">
@@ -29,33 +30,38 @@
     <div class="score-explainer">
         <h2>How we calculate your score</h2>
 
-        <div class="factor-grid">
-            <div class="factor-card">
-                <span class="factor-weight">25%</span>
-                <span class="factor-name">Code</span>
-                <span class="factor-desc">Duplication, dead code, and overall code quality.</span>
-            </div>
-            <div class="factor-card">
-                <span class="factor-weight">25%</span>
-                <span class="factor-name">Complexity</span>
-                <span class="factor-desc">Cyclomatic complexity and how deeply nested your logic is.</span>
-            </div>
-            <div class="factor-card">
-                <span class="factor-weight">25%</span>
-                <span class="factor-name">Architecture</span>
-                <span class="factor-desc">Separation of concerns and dependency structure.</span>
-            </div>
-            <div class="factor-card">
-                <span class="factor-weight">25%</span>
-                <span class="factor-name">Style</span>
-                <span class="factor-desc">How closely your code follows PSR-12 coding standards.</span>
-            </div>
-        </div>
+        <ul class="factor-list">
+            <li>
+                <div class="factor-heading">
+                    <span class="factor-name">Code</span>
+                    <span class="factor-weight">25%</span>
+                </div>
+                <p class="factor-desc">Duplication, dead code, and overall code quality.</p>
+            </li>
+            <li>
+                <div class="factor-heading">
+                    <span class="factor-name">Complexity</span>
+                    <span class="factor-weight">25%</span>
+                </div>
+                <p class="factor-desc">Cyclomatic complexity and how deeply nested your logic is.</p>
+            </li>
+            <li>
+                <div class="factor-heading">
+                    <span class="factor-name">Architecture</span>
+                    <span class="factor-weight">25%</span>
+                </div>
+                <p class="factor-desc">Separation of concerns and dependency structure.</p>
+            </li>
+            <li>
+                <div class="factor-heading">
+                    <span class="factor-name">Style</span>
+                    <span class="factor-weight">25%</span>
+                </div>
+                <p class="factor-desc">How closely your code follows PSR-12 coding standards.</p>
+            </li>
+        </ul>
 
-        <div class="explainer-notes">
-            <p><strong>Static analysis errors</strong> (via PHPStan) subtract points — the more errors, the bigger the penalty, up to 30 points.</p>
-            <p><strong>Code smells</strong> like oversized controllers, overloaded models, and views with embedded PHP don't change the score directly, but become your top recommendations below.</p>
-        </div>
+        <p class="explainer-note"><strong>PHPStan errors</strong> subtract up to 30 points. <strong>Code smells</strong> like oversized controllers, overloaded models, and views with embedded PHP don't change the score directly — they become your top recommendations instead.</p>
     </div>
 
     @include('partials.rating-legend')
