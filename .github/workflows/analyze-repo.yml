@@ -56,6 +56,13 @@ jobs:
           cd /tmp/repo
           composer require --dev nunomaduro/phpinsights || true
 
+      # PHP Insights se niega a correr sin config/insights.php publicado, incluso en modo JSON.
+      # --provider (no --tag=config, que es genérico y republicaría configs de otros paquetes)
+      - name: Publish PHP Insights config
+        run: |
+          cd /tmp/repo
+          php artisan vendor:publish --provider="NunoMaduro\PhpInsights\Application\Adapters\Laravel\InsightsServiceProvider" --force || true
+
       # phpstan/insights devuelven exit != 0 cuando encuentran errores (caso normal) -> || true evita
       # que el step aborte el job antes de reportar resultados
       - name: Run PHP Insights
@@ -68,10 +75,11 @@ jobs:
           cd /tmp/repo
           composer require --dev phpstan/phpstan || true
 
+      # PHPStan exige al menos un path a analizar; "app" es la convención estándar de Laravel.
       - name: Run PHPStan
         run: |
           cd /tmp/repo
-          vendor/bin/phpstan analyse --error-format=json > /tmp/phpstan.json || true
+          vendor/bin/phpstan analyse app --level=5 --error-format=json > /tmp/phpstan.json || true
 
       - name: Run Taylor-style rules
         run: |
