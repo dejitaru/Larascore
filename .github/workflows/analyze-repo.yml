@@ -28,11 +28,6 @@ jobs:
         with:
           php-version: '8.3'
 
-      # El repo objetivo es desconocido/no confiable, pero corre en un runner efímero y aislado
-      # (ver proyect.md sección de seguridad); permitir sus plugins de Composer no amplía ese riesgo.
-      - name: Allow Composer plugins globally
-        run: composer config --global allow-plugins true
-
       # Inputs pasados por env, nunca interpolados con ${{ }} dentro de run: (evita inyección de comandos)
       - name: Clone target repo
         env:
@@ -40,6 +35,16 @@ jobs:
           REPO_NAME: ${{ inputs.repo_name }}
         run: |
           git clone "https://github.com/${REPO_OWNER}/${REPO_NAME}.git" /tmp/repo
+
+      # El composer.json del repo objetivo suele traer su propio "allow-plugins" (ej: el de
+      # laravel/laravel trae pestphp/pest-plugin, php-http/discovery) que sustituye por completo
+      # cualquier allow-plugins global, así que hay que sobreescribirlo a nivel de proyecto.
+      # El repo objetivo es desconocido/no confiable, pero corre en un runner efímero y aislado
+      # (ver proyect.md sección de seguridad); permitir sus plugins de Composer no amplía ese riesgo.
+      - name: Allow Composer plugins in target repo
+        run: |
+          cd /tmp/repo
+          composer config allow-plugins true
 
       - name: Install dependencies
         run: |
