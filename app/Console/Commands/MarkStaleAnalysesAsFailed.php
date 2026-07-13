@@ -19,7 +19,7 @@ class MarkStaleAnalysesAsFailed extends Command
      *
      * @var string
      */
-    protected $description = 'Marca como failed los analyses atascados en "analyzing" (el workflow nunca reportó de vuelta).';
+    protected $description = 'Marks analyses stuck in "analyzing" as failed (the workflow never reported back).';
 
     /**
      * Execute the console command.

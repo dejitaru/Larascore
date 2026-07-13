@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Analysis;
+use App\Services\ScoreCalculator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -36,6 +37,7 @@ class ScoreController extends Controller
         return [
             'status' => $analysis->status,
             'score' => $analysis->score,
+            'rating' => $analysis->score !== null ? ScoreCalculator::ratingFor($analysis->score) : null,
             'metrics' => $analysis->metrics_json,
             'recommendations' => $analysis->recommendations_json,
         ];

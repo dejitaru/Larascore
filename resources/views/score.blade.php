@@ -11,16 +11,20 @@
         </p>
 
         <div id="pending-state" style="{{ in_array($analysis->status, ['pending', 'analyzing']) ? '' : 'display:none;' }}">
-            <p>Analizando repo... esto puede tomar unos minutos.</p>
+            <p>Analyzing repo... this can take a few minutes.</p>
         </div>
 
         <div id="failed-state" style="{{ $analysis->status === 'failed' ? '' : 'display:none;' }}">
-            <p>El análisis falló. Puedes intentar de nuevo desde la <a href="{{ route('home') }}">página principal</a>.</p>
+            <p>The analysis failed. You can try again from the <a href="{{ route('home') }}">home page</a>.</p>
         </div>
 
         <div id="completed-state" style="{{ $analysis->status === 'completed' ? '' : 'display:none;' }}">
-            <div class="score" id="score-value">{{ $analysis->score }}</div>
+            <div class="score-row">
+                <div class="score" id="score-value">{{ $analysis->score }}</div>
+                <span class="rating" id="rating-badge">{{ $analysis->score !== null ? \App\Services\ScoreCalculator::ratingFor($analysis->score) : '' }}</span>
+            </div>
             <p>/100</p>
+            @include('partials.rating-legend')
 
             <div class="metrics" id="metrics-grid">
                 @if ($analysis->metrics_json)
@@ -33,7 +37,7 @@
                 @endif
             </div>
 
-            <h3>Top recomendaciones</h3>
+            <h3>Top recommendations</h3>
             <ul class="recommendations" id="recommendations-list">
                 @if ($analysis->recommendations_json)
                     @foreach ($analysis->recommendations_json as $recommendation)
@@ -44,7 +48,7 @@
         </div>
     </div>
 
-    <p><a href="{{ route('home') }}">← Analizar otro repo</a></p>
+    <p><a href="{{ route('home') }}">← Analyze another repo</a></p>
 
     @if (in_array($analysis->status, ['pending', 'analyzing']))
         <script>
@@ -67,6 +71,7 @@
                     if (data.status === 'completed') {
                         document.getElementById('completed-state').style.display = '';
                         document.getElementById('score-value').textContent = data.score;
+                        document.getElementById('rating-badge').textContent = data.rating || '';
 
                         const metricsGrid = document.getElementById('metrics-grid');
                         metricsGrid.innerHTML = '';

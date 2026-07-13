@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -80,10 +80,29 @@
             border-radius: 0.75rem;
             padding: 1.5rem;
         }
+        .score-row {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
         .score {
             font-size: 4rem;
             font-weight: 700;
             line-height: 1;
+        }
+        .rating {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid var(--border);
+        }
+        .rating-legend {
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--muted);
         }
         .metrics {
             display: grid;
@@ -128,7 +147,7 @@
 <body>
     <main>
         @yield('content')
-        <footer>Inspirado en las ideas de Taylor Otwell sobre mantenibilidad y simplicidad.</footer>
+        <footer>Inspired on maintainability and simplicity.</footer>
     </main>
 </body>
 </html>

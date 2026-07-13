@@ -5,12 +5,23 @@ namespace App\Services;
 class ScoreCalculator
 {
     /**
+     * @var array<int, array{min: int, label: string}>
+     */
+    private const RATING_BANDS = [
+        ['min' => 90, 'label' => 'Excellent'],
+        ['min' => 75, 'label' => 'Good'],
+        ['min' => 60, 'label' => 'Fair'],
+        ['min' => 40, 'label' => 'Needs Improvement'],
+        ['min' => 0, 'label' => 'Poor'],
+    ];
+
+    /**
      * @return array{score: int, metrics: array<string, mixed>, recommendations: array<int, string>}
      */
     public function calculate(?array $phpstan, ?array $insights, ?array $taylorRules = null): array
     {
-        // Estructura asumida del JSON de PHP Insights (summary.*) y PHPStan (totals.file_errors);
-        // ajustar estas rutas si el formato real difiere al probar contra un análisis real.
+        // Assumed shape of PHP Insights JSON (summary.*) and PHPStan's (totals.file_errors);
+        // adjust these paths if the real format differs once tested against a live analysis.
         $insightsCode = (float) ($insights['summary']['code'] ?? 0);
         $insightsComplexity = (float) ($insights['summary']['complexity'] ?? 0);
         $insightsArchitecture = (float) ($insights['summary']['architecture'] ?? 0);
@@ -53,6 +64,33 @@ class ScoreCalculator
         ];
     }
 
+    public static function ratingFor(int $score): string
+    {
+        foreach (self::RATING_BANDS as $band) {
+            if ($score >= $band['min']) {
+                return $band['label'];
+            }
+        }
+
+        return 'Poor';
+    }
+
+    /**
+     * @return array<int, array{min: int, max: int, label: string}>
+     */
+    public static function ratingBands(): array
+    {
+        $bands = [];
+        $previousMin = 101;
+
+        foreach (self::RATING_BANDS as $band) {
+            $bands[] = ['min' => $band['min'], 'max' => $previousMin - 1, 'label' => $band['label']];
+            $previousMin = $band['min'];
+        }
+
+        return $bands;
+    }
+
     /**
      * @param  array<string, mixed>  $metrics
      * @param  array<string, array<int, array<string, mixed>>>  $taylorRules
@@ -63,41 +101,41 @@ class ScoreCalculator
         $recommendations = [];
 
         foreach ($this->worstOffenders($taylorRules['oversized_controllers'], 'lines', 1) as $controller) {
-            $recommendations[] = "El controller {$controller['file']} tiene {$controller['lines']} líneas; divídelo en Action classes más pequeñas.";
+            $recommendations[] = "Controller {$controller['file']} has {$controller['lines']} lines; split it into smaller Action classes.";
         }
 
         foreach ($this->worstOffenders($taylorRules['overloaded_models'], 'methods', 1) as $model) {
-            $recommendations[] = "El modelo {$model['file']} tiene {$model['methods']} métodos públicos; mueve lógica de negocio a Services/Actions.";
+            $recommendations[] = "Model {$model['file']} has {$model['methods']} public methods; move business logic into Services/Actions.";
         }
 
         foreach ($this->worstOffenders($taylorRules['views_with_embedded_php'], 'php_lines', 1) as $view) {
-            $recommendations[] = "La vista {$view['file']} tiene ~{$view['php_lines']} líneas de PHP embebido; múevelas a un componente o view model.";
+            $recommendations[] = "View {$view['file']} has ~{$view['php_lines']} lines of embedded PHP; move it into a component or view model.";
         }
 
         if ($metrics['phpstan_errors'] > 20) {
-            $recommendations[] = "Resuelve los {$metrics['phpstan_errors']} errores reportados por PHPStan; son la mayor fuente de riesgo de bugs.";
+            $recommendations[] = "Fix the {$metrics['phpstan_errors']} errors reported by PHPStan; they're the biggest source of bug risk.";
         } elseif ($metrics['phpstan_errors'] > 0) {
-            $recommendations[] = "Corrige los {$metrics['phpstan_errors']} errores reportados por PHPStan.";
+            $recommendations[] = "Fix the {$metrics['phpstan_errors']} errors reported by PHPStan.";
         }
 
         if ($metrics['insights_complexity'] < 70) {
-            $recommendations[] = 'Reduce la complejidad ciclomática: divide métodos largos y evita anidamiento profundo.';
+            $recommendations[] = 'Reduce cyclomatic complexity: split long methods and avoid deep nesting.';
         }
 
         if ($metrics['insights_architecture'] < 70) {
-            $recommendations[] = 'Revisa la arquitectura: separa lógica de negocio en Services/Actions en vez de Controllers/Models.';
+            $recommendations[] = 'Review the architecture: move business logic into Services/Actions instead of Controllers/Models.';
         }
 
         if ($metrics['insights_style'] < 70) {
-            $recommendations[] = 'Aplica un formateador de estilo (Laravel Pint) para cumplir con las convenciones de código.';
+            $recommendations[] = 'Apply a code style formatter (Laravel Pint) to follow coding conventions.';
         }
 
         if ($metrics['insights_code'] < 70) {
-            $recommendations[] = 'Mejora la calidad general del código: revisa duplicación y código muerto.';
+            $recommendations[] = 'Improve overall code quality: check for duplication and dead code.';
         }
 
         if (empty($recommendations)) {
-            $recommendations[] = '¡Buen trabajo! No se detectaron problemas prioritarios en este análisis.';
+            $recommendations[] = 'Nice work! No priority issues were found in this analysis.';
         }
 
         return array_slice($recommendations, 0, 5);

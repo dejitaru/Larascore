@@ -26,7 +26,7 @@ class AnalyzeController extends Controller
 
         if (! $parsed) {
             return back()
-                ->withErrors(['repo_url' => 'URL de repositorio de GitHub inválida. Usa el formato https://github.com/owner/repo.'])
+                ->withErrors(['repo_url' => 'Invalid GitHub repository URL. Use the format https://github.com/owner/repo.'])
                 ->withInput();
         }
 
@@ -34,7 +34,7 @@ class AnalyzeController extends Controller
 
         if (! $repoValidator->isLaravelRepo($owner, $repoName)) {
             return back()
-                ->withErrors(['repo_url' => 'El repositorio no parece ser un proyecto Laravel (no se encontró laravel/framework en composer.json).'])
+                ->withErrors(['repo_url' => 'This repository does not look like a Laravel project (laravel/framework was not found in composer.json).'])
                 ->withInput();
         }
 
@@ -53,7 +53,7 @@ class AnalyzeController extends Controller
             report($e);
 
             return back()
-                ->withErrors(['repo_url' => 'No se pudo iniciar el análisis. Intenta de nuevo más tarde.'])
+                ->withErrors(['repo_url' => 'Could not start the analysis. Please try again later.'])
                 ->withInput();
         }
 
