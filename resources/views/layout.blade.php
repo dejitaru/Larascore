@@ -12,6 +12,12 @@
             --muted: #706f6c;
             --border: #e3e3e0;
             --accent: #f53003;
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-6: 24px;
+            --space-8: 32px;
         }
         @media (prefers-color-scheme: dark) {
             :root {
@@ -75,6 +81,64 @@
             color: var(--accent);
             font-size: 0.9rem;
         }
+        .score-explainer {
+            margin-top: var(--space-8);
+            padding: var(--space-6);
+            border-left: 3px solid var(--accent);
+            background: rgba(245, 48, 3, 0.04);
+            background: color-mix(in srgb, var(--accent) 6%, transparent);
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        .score-explainer h2 {
+            margin: 0 0 var(--space-4);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+        .factor-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-4);
+        }
+        .factor-card {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+        .factor-weight {
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .factor-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .factor-desc {
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+        .explainer-notes {
+            margin: var(--space-6) 0 0;
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+        .explainer-notes p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+        .explainer-notes strong {
+            color: var(--fg);
+            font-weight: 600;
+        }
         .card {
             border: 1px solid var(--border);
             border-radius: 0.75rem;
@@ -91,21 +155,45 @@
             font-weight: 700;
             line-height: 1;
         }
-        .rating {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
+        .rating,
+        .rating-chip {
+            --chip-h: 0;
+            --chip-s: 70%;
+            --chip-l: 45%;
+            display: inline-flex;
+            align-items: baseline;
+            gap: 0.4em;
+            padding: 0.3rem 0.75rem;
             border-radius: 999px;
             font-size: 0.85rem;
             font-weight: 600;
-            border: 1px solid var(--border);
+            background: hsl(var(--chip-h) var(--chip-s) var(--chip-l) / 0.12);
+            border: 1px solid hsl(var(--chip-h) var(--chip-s) var(--chip-l) / 0.35);
+            color: hsl(var(--chip-h) var(--chip-s) var(--chip-l));
         }
-        .rating-legend {
-            margin-top: 0.75rem;
-            font-size: 0.8rem;
-            color: var(--muted);
-        }
-        .rating-legend-item {
+        .rating-chip-range {
+            font-size: 0.8em;
+            font-weight: 500;
+            opacity: 0.8;
             white-space: nowrap;
+        }
+        .is-excellent { --chip-h: 142; --chip-s: 65%; --chip-l: 38%; }
+        .is-good { --chip-h: 172; --chip-s: 55%; --chip-l: 35%; }
+        .is-fair { --chip-h: 43; --chip-s: 90%; --chip-l: 40%; }
+        .is-needs-improvement { --chip-h: 25; --chip-s: 90%; --chip-l: 45%; }
+        .is-poor { --chip-h: 4; --chip-s: 80%; --chip-l: 48%; }
+        @media (prefers-color-scheme: dark) {
+            .is-excellent { --chip-l: 58%; }
+            .is-good { --chip-l: 55%; }
+            .is-fair { --chip-l: 58%; }
+            .is-needs-improvement { --chip-l: 62%; }
+            .is-poor { --chip-l: 64%; }
+        }
+        .rating-scale {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-2);
+            margin-top: var(--space-6);
         }
         .metrics {
             display: grid;

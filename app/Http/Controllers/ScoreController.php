@@ -38,6 +38,7 @@ class ScoreController extends Controller
             'status' => $analysis->status,
             'score' => $analysis->score,
             'rating' => $analysis->score !== null ? ScoreCalculator::ratingFor($analysis->score) : null,
+            'ratingSlug' => $analysis->score !== null ? ScoreCalculator::ratingSlugFor($analysis->score) : null,
             'metrics' => $analysis->metrics_json,
             'recommendations' => $analysis->recommendations_json,
         ];

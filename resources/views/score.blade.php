@@ -21,7 +21,7 @@
         <div id="completed-state" style="{{ $analysis->status === 'completed' ? '' : 'display:none;' }}">
             <div class="score-row">
                 <div class="score" id="score-value">{{ $analysis->score }}</div>
-                <span class="rating" id="rating-badge">{{ $analysis->score !== null ? \App\Services\ScoreCalculator::ratingFor($analysis->score) : '' }}</span>
+                <span class="rating {{ $analysis->score !== null ? 'is-' . \App\Services\ScoreCalculator::ratingSlugFor($analysis->score) : '' }}" id="rating-badge">{{ $analysis->score !== null ? \App\Services\ScoreCalculator::ratingFor($analysis->score) : '' }}</span>
             </div>
             <p>/100</p>
             @include('partials.rating-legend')
@@ -71,7 +71,9 @@
                     if (data.status === 'completed') {
                         document.getElementById('completed-state').style.display = '';
                         document.getElementById('score-value').textContent = data.score;
-                        document.getElementById('rating-badge').textContent = data.rating || '';
+                        const ratingBadge = document.getElementById('rating-badge');
+                        ratingBadge.textContent = data.rating || '';
+                        ratingBadge.className = 'rating' + (data.ratingSlug ? ` is-${data.ratingSlug}` : '');
 
                         const metricsGrid = document.getElementById('metrics-grid');
                         metricsGrid.innerHTML = '';

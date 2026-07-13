@@ -5,14 +5,14 @@ namespace App\Services;
 class ScoreCalculator
 {
     /**
-     * @var array<int, array{min: int, label: string}>
+     * @var array<int, array{min: int, label: string, slug: string}>
      */
     private const RATING_BANDS = [
-        ['min' => 90, 'label' => 'Excellent'],
-        ['min' => 75, 'label' => 'Good'],
-        ['min' => 60, 'label' => 'Fair'],
-        ['min' => 40, 'label' => 'Needs Improvement'],
-        ['min' => 0, 'label' => 'Poor'],
+        ['min' => 90, 'label' => 'Excellent', 'slug' => 'excellent'],
+        ['min' => 75, 'label' => 'Good', 'slug' => 'good'],
+        ['min' => 60, 'label' => 'Fair', 'slug' => 'fair'],
+        ['min' => 40, 'label' => 'Needs Improvement', 'slug' => 'needs-improvement'],
+        ['min' => 0, 'label' => 'Poor', 'slug' => 'poor'],
     ];
 
     /**
@@ -66,17 +66,16 @@ class ScoreCalculator
 
     public static function ratingFor(int $score): string
     {
-        foreach (self::RATING_BANDS as $band) {
-            if ($score >= $band['min']) {
-                return $band['label'];
-            }
-        }
+        return self::bandFor($score)['label'];
+    }
 
-        return 'Poor';
+    public static function ratingSlugFor(int $score): string
+    {
+        return self::bandFor($score)['slug'];
     }
 
     /**
-     * @return array<int, array{min: int, max: int, label: string}>
+     * @return array<int, array{min: int, max: int, label: string, slug: string}>
      */
     public static function ratingBands(): array
     {
@@ -84,11 +83,30 @@ class ScoreCalculator
         $previousMin = 101;
 
         foreach (self::RATING_BANDS as $band) {
-            $bands[] = ['min' => $band['min'], 'max' => $previousMin - 1, 'label' => $band['label']];
+            $bands[] = [
+                'min' => $band['min'],
+                'max' => $previousMin - 1,
+                'label' => $band['label'],
+                'slug' => $band['slug'],
+            ];
             $previousMin = $band['min'];
         }
 
         return $bands;
+    }
+
+    /**
+     * @return array{min: int, label: string, slug: string}
+     */
+    private static function bandFor(int $score): array
+    {
+        foreach (self::RATING_BANDS as $band) {
+            if ($score >= $band['min']) {
+                return $band;
+            }
+        }
+
+        return self::RATING_BANDS[array_key_last(self::RATING_BANDS)];
     }
 
     /**
