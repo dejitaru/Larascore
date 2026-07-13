@@ -23,7 +23,9 @@ class GitHubActionsService
                     'repo_owner' => $analysis->repo_owner,
                     'repo_name' => $analysis->repo_name,
                     'callback_token' => $analysis->callback_token,
-                    'callback_url' => route('api.analysis-result'),
+                    // route() resolves against the *incoming request's* host, which is wrong here:
+                    // this URL is called back hours later from GitHub's network, not the requester's.
+                    'callback_url' => rtrim(config('app.url'), '/') . '/api/analysis-result',
                 ],
             ]);
 
